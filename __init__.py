@@ -24,12 +24,9 @@ COLORS = {
 }
 
 COLOR_ASSIGN = {
-    'background': COLORS['black'],
+    'background': COLORS['blue'],
     'snake': COLORS['white'],
 }
-
-BACKGROUND = COLORS['black']
-SNAKE = COLORS['white']
 
 def render_error(err1, err2):
     with display.open() as disp:
@@ -53,6 +50,8 @@ game_running = True
 reset()
 while game_running:
     with display.open() as disp:
-        disp.rect(position[0], position[1], 2, 2, col=FOREGROUND, filled=True)
+        disp.rect(0, 0, 160, 80, col=COLOR_ASSIGN['background'], filled=True)
+        disp.rect(position[0], position[1], 2, 2, col=COLOR_ASSIGN['snake'], filled=True)
         disp.update()
         disp.close()
+        utime.sleep(0.5)
