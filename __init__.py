@@ -2,7 +2,7 @@
 Snake for Card10
 
 by Simon Schiele (simon.codingmonkey@gmail.com)
-come visit us at darksystem! :-)
+come visit us at darksystem village! :-)
 
 """
 import utime
@@ -54,3 +54,5 @@ reset()
 while game_running:
     with display.open() as disp:
         disp.rect(position[0], position[1], 2, 2, col=FOREGROUND, filled=True)
+        disp.update()
+        disp.close()
