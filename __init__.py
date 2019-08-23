@@ -30,10 +30,13 @@ COLOR_ASSIGN = {
 position = (0, 0)
 display_size = (160, 80)
 snake_size = (5, 5)
-snake_max_length = 25
-speed = 0.2
 game_running = True
-gamestatus = {'points': 0, 'status': 'intro', 'level': 0}
+game = {
+    'level_length': 5,
+    'max_length': 10,
+    'speed': 240,
+    'status': 'intro',
+}
 directions = ['N', 'E', 'S', 'W']
 direction = 1
 snake = [(0, 0), ]
@@ -79,11 +82,7 @@ def snake_move(snake):
     elif directions[direction] == 'W':
         next_step.append(last[0] - 1)
         next_step.append(last[1])
-    else:
-        render_message("error", "snake_move error")
 
-    #next_step[0] = next_step[0] % ( max_position[0] - 1)
-    #next_step[1] = next_step[1] % ( max_position[1] - 1)
     next_step[0] = next_step[0] % max_position[0]
     next_step[1] = next_step[1] % max_position[1]
     snake.append((next_step[0], next_step[1]))
@@ -92,6 +91,8 @@ def snake_move(snake):
 def draw_apples(disp, apples):
     if len(apples) == 0:
         new_apple = (urandom.randint(0, max_position[0]), urandom.randint(1, max_position[1]))
+        while new_apple in snake:
+            new_apple = (urandom.randint(0, max_position[0]), urandom.randint(1, max_position[1]))
         apples.append(new_apple)
 
     for x, y in apples:
@@ -100,31 +101,54 @@ def draw_apples(disp, apples):
         disp.rect(x2, y2, x2 + snake_size[0], y2 + snake_size[1], col=COLOR_ASSIGN['apple'], filled=True)
 
 
-def draw_messages(disp, gamestatus):
-    disp.print(str(gamestatus['points']), posx=145, posy=15)
+def draw_messages(disp, game):
+    disp.print(str(game['points']), posx=display_size[0] - (len(str(game['points'])) * 14), posy=0)
 
 
 reset()
 while game_running:
 
-    if gamestatus['status'] == 'intro':
-        gamestatus['status'] = 'game'
+    if game['status'] == 'intro':
+        game['status'] = 'start'
+        render_message("Snake!", "by Darksystem")
+        utime.sleep(3)
 
-    elif gamestatus['status'] == 'game':
+    elif game['status'] == 'start':
+        game['points'] = 0 
+        game['level'] = 0
+        game['speed'] = 240
+        game['status'] = 'level'
+        snake = [(0, 0), ]
+        direction = 1
+
+    elif game['status'] == 'level':
+        game['status'] = 'game'
+        game['points_level'] = 0
+        if game['speed'] >= 41:
+            game['speed'] -= 40
+        render_message("Level " + str(game['level']), "Get Ready...")
+        utime.sleep(1.5)
+
+    elif game['status'] == 'game':
 
         last_position = snake[-1]
         for i in apples:
             if last_position == i:
                 apples = []
-                gamestatus['points'] += 1
+                game['points'] += 1
+                game['points_level'] += 1
+                game['max_length'] += 1
 
         snake_move(snake)
         
-        if len(snake) > 2 and snake[-1] in snake[:-1]:
-            gamestatus['status'] = 'outro'
+        if game['points_level'] >= game['level_length']:
+            game['level'] += 1
+            game['status'] = 'level'
+        elif len(snake) > 2 and snake[-1] in snake[:-1]:
+            game['status'] = 'outro'
         else:
 
-            if len(snake) > snake_max_length:
+            if len(snake) > game['max_length']:
                 snake = snake[1:]
 
             pressed = buttons.read(
@@ -140,19 +164,15 @@ while game_running:
                 direction = direction % 4
             
             with display.open() as disp:
-                disp.rect(0, 0, 160, 80, col=COLOR_ASSIGN['background'], filled=True)
-                draw_messages(disp, gamestatus)
+                disp.rect(0, 0, display_size[0], display_size[1], col=COLOR_ASSIGN['background'], filled=True)
+                draw_messages(disp, game)
                 draw_apples(disp, apples)
                 draw_snake(disp, snake)
                 disp.update()
                 disp.close()
-                utime.sleep(speed)
+                utime.sleep_ms(game['speed'])
 
-    elif gamestatus['status'] == 'outro':
-        render_message("Game Over!", "Score: " + str(gamestatus['points']))
-        utime.sleep(5)
-        gamestatus['points'] = 0
-        gamestatus['gamestatus'] = 'intro'
-        gamestatus['level'] = 0
-        snake = [(0, 0), ]
-        direction = 1
+    elif game['status'] == 'outro':
+        game['status'] = 'start'
+        render_message("Game Over!", "Score: " + str(game['points']))
+        utime.sleep(7.5)
