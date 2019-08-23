@@ -12,6 +12,7 @@ import leds
 import buttons
 import os
 
+
 COLORS = {
     'black': [0, 0, 0],
     'white': [255, 255, 255],    
@@ -26,22 +27,6 @@ COLOR_ASSIGN = {
     'snake': COLORS['white'],
     'apple': COLORS['red'],
 }
-
-position = (0, 0)
-display_size = (160, 80)
-snake_size = (5, 5)
-game_running = True
-game = {
-    'level_length': 5,
-    'max_length': 10,
-    'speed': 240,
-    'status': 'intro',
-}
-directions = ['N', 'E', 'S', 'W']
-direction = 1
-snake = [(0, 0), ]
-apples = []
-max_position = (int(display_size[0] / snake_size[0]), int(display_size[1] / snake_size[1]))
 
 
 def render_message(msg1, msg2):
@@ -60,14 +45,14 @@ def reset():
         disp.close()
 
 
-def draw_snake(disp, snake):
+def draw_snake():
     for x, y in snake:
         x2 = x * snake_size[0]
         y2 = y * snake_size[1]
         disp.rect(x2, y2, x2 + snake_size[0], y2 + snake_size[1], col=COLOR_ASSIGN['snake'], filled=True)
 
 
-def snake_move(snake):
+def snake_move():
     next_step = []
     last = snake[-1]
     if directions[direction] == 'N':
@@ -88,7 +73,7 @@ def snake_move(snake):
     snake.append((next_step[0], next_step[1]))
 
 
-def draw_apples(disp, apples):
+def draw_apples():
     if len(apples) == 0:
         new_apple = (urandom.randint(0, max_position[0]), urandom.randint(1, max_position[1]))
         while new_apple in snake:
@@ -101,9 +86,25 @@ def draw_apples(disp, apples):
         disp.rect(x2, y2, x2 + snake_size[0], y2 + snake_size[1], col=COLOR_ASSIGN['apple'], filled=True)
 
 
-def draw_messages(disp, game):
+def draw_messages():
     disp.print(str(game['points']), posx=display_size[0] - (len(str(game['points'])) * 14), posy=0)
 
+
+position = (0, 0)
+display_size = (160, 80)
+snake_size = (5, 5)
+game_running = True
+game = {
+    'level_length': 5,
+    'max_length': 10,
+    'speed': 240,
+    'status': 'intro',
+}
+directions = ['N', 'E', 'S', 'W']
+direction = 1
+snake = [(0, 0), ]
+apples = []
+max_position = (int(display_size[0] / snake_size[0]), int(display_size[1] / snake_size[1]))
 
 reset()
 while game_running:
@@ -139,7 +140,7 @@ while game_running:
                 game['points_level'] += 1
                 game['max_length'] += 1
 
-        snake_move(snake)
+        snake_move()
         
         if game['points_level'] >= game['level_length']:
             game['level'] += 1
@@ -165,9 +166,9 @@ while game_running:
             
             with display.open() as disp:
                 disp.rect(0, 0, display_size[0], display_size[1], col=COLOR_ASSIGN['background'], filled=True)
-                draw_messages(disp, game)
-                draw_apples(disp, apples)
-                draw_snake(disp, snake)
+                draw_messages()
+                draw_apples()
+                draw_snake()
                 disp.update()
                 disp.close()
                 utime.sleep_ms(game['speed'])
