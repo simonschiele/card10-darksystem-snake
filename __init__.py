@@ -110,7 +110,7 @@ while game_running:
 
     if game['status'] == 'intro':
         game['status'] = 'start'
-        render_message("Snake!", "by Darksystem")
+        render_message("Darksystem", "Snake!")
         utime.sleep(3)
 
     elif game['status'] == 'start':
