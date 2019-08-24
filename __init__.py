@@ -117,6 +117,7 @@ while game_running:
     elif game['status'] == 'start':
         game['points'] = 0 
         game['level'] = 0
+        game['max_length'] = 10
         game['speed'] = 240
         game['status'] = 'level'
         snake = [(0, 0), ]
